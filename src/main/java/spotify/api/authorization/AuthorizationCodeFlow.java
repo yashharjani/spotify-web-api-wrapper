@@ -29,6 +29,15 @@ public class AuthorizationCodeFlow {
     private AuthorizationCodeFlow() {
     }
 
+    public AuthorizationCodeFlow(String clientId, String responseType, String redirectUri, String state, List<AuthorizationScope> scopes, boolean showDialog) {
+        this.clientId = clientId;
+        this.responseType = responseType;
+        this.redirectUri = redirectUri;
+        this.state = state;
+        this.scopes = scopes;
+        this.showDialog = showDialog;
+    }
+
     /**
      * Constructs a url for the first step in the authorization code flow
      *
@@ -106,18 +115,7 @@ public class AuthorizationCodeFlow {
          * @return the authorization code flow
          */
         public AuthorizationCodeFlow build() {
-            logger.trace("Constructing AuthorizationCodeFlow object.");
-            AuthorizationCodeFlow authorizationCodeFlow = new AuthorizationCodeFlow();
-            authorizationCodeFlow.clientId = this.clientId;
-            authorizationCodeFlow.responseType = this.responseType;
-            authorizationCodeFlow.redirectUri = this.redirectUri;
-            authorizationCodeFlow.state = this.state;
-            authorizationCodeFlow.scopes = this.scopes;
-            authorizationCodeFlow.showDialog = this.showDialog;
-
-            logger.trace("AuthorizationCodeFlow successfully constructed.");
-            logger.debug(String.valueOf(authorizationCodeFlow));
-            return authorizationCodeFlow;
+            return new AuthorizationCodeFlow(clientId, responseType, redirectUri, state, scopes, showDialog);
         }
     }
 

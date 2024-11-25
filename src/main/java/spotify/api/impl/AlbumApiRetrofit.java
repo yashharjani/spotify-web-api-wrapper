@@ -25,6 +25,7 @@ public class AlbumApiRetrofit implements AlbumApi {
     private final Logger logger = LoggerFactory.getLogger(AlbumApiRetrofit.class);
     private final String accessToken;
     private final AlbumService albumService;
+    private static final int MAX_ALBUM_IDS = 20;
 
     public AlbumApiRetrofit(final String accessToken) {
         this(accessToken, RetrofitHttpServiceFactory.getAlbumService());
@@ -60,15 +61,22 @@ public class AlbumApiRetrofit implements AlbumApi {
 
     @Override
     public AlbumFullCollection getAlbums(List<String> listOfAlbumIds, Map<String, String> options) {
-        validateAlbumListSizeAndThrowIfExceeded(listOfAlbumIds, 20);
+        validateAlbumListSizeAndThrowIfExceeded(listOfAlbumIds, MAX_ALBUM_IDS);
         options = ValidatorUtil.optionsValueCheck(options);
 
         String albumIds = String.join(",", listOfAlbumIds);
         logger.debug("Mapped list of album ids to String: {}", albumIds);
 
-        logger.trace("Constructing HTTP call to fetch albums.");
-        Call<AlbumFullCollection> httpCall = albumService.getAlbums("Bearer " + this.accessToken, albumIds, options);
+        Call<AlbumFullCollection> httpCall = constructAlbumsHttpCall(albumIds, options);
+        return executeAlbumsHttpCall(httpCall, albumIds, options);
+    }
 
+    private Call<AlbumFullCollection> constructAlbumsHttpCall(String albumIds, Map<String, String> options) {
+        logger.trace("Constructing HTTP call to fetch albums.");
+        return albumService.getAlbums("Bearer " + this.accessToken, albumIds, options);
+    }
+
+    private AlbumFullCollection executeAlbumsHttpCall(Call<AlbumFullCollection> httpCall, String albumIds, Map<String, String> options) {
         try {
             logger.info("Executing HTTP call to fetch albums.");
             logger.debug("Fetching following albums: {} with following values: {}.", albumIds, options);
